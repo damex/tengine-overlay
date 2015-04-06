@@ -16,17 +16,19 @@ ENCRYPTED_SESSION_URI="https://github.com/${ENCRYPTED_SESSION_A}/${ENCRYPTED_SES
 ENCRYPTED_SESSION_WD="${WORKDIR}/${ENCRYPTED_SESSION_P}"
 
 # MogileFS Client (http://www.grid.net.ru/nginx/mogilefs.en.html)
+MOGILEFS_A="vkholodkov"
 MOGILEFS_PN="nginx-mogilefs-module"
 MOGILEFS_PV="1.0.4"
 MOGILEFS_P="${MOGILEFS_PN}-${MOGILEFS_PV}"
-MOGILEFS_URI="https://github.com/vkholodkov/${MOGILEFS_PN}/archive/${MOGILEFS_PV}.tar.gz"
+MOGILEFS_URI="https://github.com/${MOGILEFS_A}/${MOGILEFS_PN}/archive/${MOGILEFS_PV}.tar.gz"
 MOGILEFS_WD="${WORKDIR}/${MOGILEFS_P}"
 
 # Nginx Development Kit (NDK) (https://github.com/simpl/ngx_devel_kit)
+NDK_A="simpl"
 NDK_PN="ngx_devel_kit"
 NDK_PV="0.2.19"
 NDK_P="${NDK_PN}-${NDK_PV}"
-NDK_URI="https://github.com/simpl/${NDK_PN}/archive/v${NDK_PV}.tar.gz"
+NDK_URI="https://github.com/${NDK_A}/${NDK_PN}/archive/v${NDK_PV}.tar.gz"
 NDK_WD="${WORKDIR}/${NDK_P}"
 
 # Phusion Passenger (https://github.com/phusion/passenger)
