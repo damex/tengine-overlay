@@ -175,8 +175,8 @@ pkg_setup() {
 	TENGINE_HOME="${EROOT}var/lib/${PN}"
 	TENGINE_HOME_TMP="${TENGINE_HOME}/tmp"
 
-	enewuser ${PN} -1 -1 "${TENGINE_HOME}" ${PN}
 	enewgroup ${PN}
+	enewuser ${PN} -1 -1 "${TENGINE_HOME}" ${PN}
 
 	if use libatomic ; then
 		ewarn "GCC 4.1+ features built-in atomic operations."
