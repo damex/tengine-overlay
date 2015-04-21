@@ -52,11 +52,16 @@ inherit eutils flag-o-matic perl-module ruby-ng ssl-cert toolchain-funcs user
 DESCRIPTION="Robust, small and high performance http and reverse proxy server"
 HOMEPAGE="http://tengine.taobao.org"
 SRC_URI="http://${PN}.taobao.org/download/${P}.tar.gz
-	tengine_external_modules_http_encrypted_session? ( ${ENCRYPTED_SESSION_URI} -> ${ENCRYPTED_SESSION_P}.tar.gz )
-	tengine_external_modules_http_fancyindex? ( ${FANCYINDEX_URI} -> ${FANCYINDEX_P}.tar.gz )
-	tengine_external_modules_http_mogilefs? ( ${MOGILEFS_URI} -> ${MOGILEFS_P}.tar.gz )
-	tengine_external_modules_http_ndk? ( ${NDK_URI} -> ${NDK_P}.tar.gz )
-	tengine_external_modules_http_passenger? ( ${PASSENGER_URI} -> ${PASSENGER_P}.tar.gz )"
+	tengine_external_modules_http_encrypted_session? (
+		${ENCRYPTED_SESSION_URI} -> ${ENCRYPTED_SESSION_P}.tar.gz )
+	tengine_external_modules_http_fancyindex? (
+		${FANCYINDEX_URI} -> ${FANCYINDEX_P}.tar.gz )
+	tengine_external_modules_http_mogilefs? (
+		${MOGILEFS_URI} -> ${MOGILEFS_P}.tar.gz )
+	tengine_external_modules_http_ndk? (
+		${NDK_URI} -> ${NDK_P}.tar.gz )
+	tengine_external_modules_http_passenger? (
+		${PASSENGER_URI} -> ${PASSENGER_P}.tar.gz )"
 
 LICENSE="BSD-2
 	tengine_external_modules_http_encrypted_session? ( BSD )
@@ -257,8 +262,10 @@ src_prepare() {
 	# Don't install to /etc/tengine/ if not in use
 	local module
 	for module in fastcgi scgi uwsgi ; do
-		if ! use_if_iuse tengine_static_modules_http_${module} && ! use_if_iuse tengine_shared_modules_http_${module} ; then
-			sed -e "/${module}/d" -i auto/install || die
+		if ! use_if_iuse tengine_static_modules_http_${module} && \
+			! use_if_iuse tengine_shared_modules_http_${module} ; then
+				sed -e "/${module}/d" \
+					-i auto/install || die
 		fi
 	done
 
@@ -312,41 +319,49 @@ src_configure() {
 	use syslog || tengine_configure+=" --without-syslog"
 
 	for module in $TENGINE_MODULES_{STANDARD,STANDARD_SHARED} ; do
-		if use tengine_static_modules_http_${module} && ! use_if_iuse tengine_shared_modules_http_${module} ; then
-			http_enabled=1
+		if use tengine_static_modules_http_${module} && \
+			! use_if_iuse tengine_shared_modules_http_${module} ; then
+				http_enabled=1
 		else
 			tengine_configure+=" --without-http_${module}_module"
 		fi
 	done
 
 	for module in $TENGINE_MODULES_STANDARD_SHARED ; do
-		if use dso && use_if_iuse tengine_shared_modules_http_${module} && ! use_if_iuse tengine_static_modules_http_${module} ; then
-			http_enabled=1
-			tengine_configure+=" --with-http_${module}_module=shared"
-		elif use dso && ! use_if_iuse tengine_shared_modules_http_${module} && ! use_if_iuse tengine_static_modules_http_${module} ; then
-			tengine_configure+=" --without-http_${module}_module"
+		if use dso && \
+			use_if_iuse tengine_shared_modules_http_${module} && \
+			! use_if_iuse tengine_static_modules_http_${module} ; then
+				http_enabled=1
+				tengine_configure+=" --with-http_${module}_module=shared"
+		elif use dso && \
+			! use_if_iuse tengine_shared_modules_http_${module} && \
+			! use_if_iuse tengine_static_modules_http_${module} ; then
+				tengine_configure+=" --without-http_${module}_module"
 		fi
 	done
 
 	for module in $TENGINE_MODULES_{OPTIONAL,OPTIONAL_SHARED} ; do
-		if use_if_iuse tengine_static_modules_http_${module} && ! use_if_iuse tengine_shared_modules_http_${module} ; then
-			http_enabled=1
-			tengine_configure+=" --with-http_${module}_module"
+		if use_if_iuse tengine_static_modules_http_${module} && \
+			! use_if_iuse tengine_shared_modules_http_${module} ; then
+				http_enabled=1
+				tengine_configure+=" --with-http_${module}_module"
 		fi
 	done
 
 	for module in $TENGINE_MODULES_OPTIONAL_SHARED ; do
-		if use dso && use_if_iuse tengine_shared_modules_http_${module} && ! use_if_iuse tengine_static_modules_http_${module} ; then
-			http_enabled=1
-			tengine_configure+=" --with-http_${module}_module=shared"
+		if use dso && use_if_iuse tengine_shared_modules_http_${module} && \
+			! use_if_iuse tengine_static_modules_http_${module} ; then
+				http_enabled=1
+				tengine_configure+=" --with-http_${module}_module=shared"
 		fi
 	done
 
-	if use_if_iuse tengine_static_modules_http_fastcgi || use_if_iuse tengine_static_modules_http_fastcgi ; then
-		tengine_configure+=" --with-http_realip_module"
+	if use_if_iuse tengine_static_modules_http_fastcgi || \
+		use_if_iuse tengine_static_modules_http_fastcgi ; then
+			tengine_configure+=" --with-http_realip_module"
 	fi
 
-	for module in ${TENGINE_MODULES_EXTERNAL} ; do
+	for module in $TENGINE_MODULES_EXTERNAL ; do
 		if use_if_iuse tengine_external_modules_http_${module} ; then
 			http_enabled=1
 			local module_wd=${module^^}_WD
@@ -481,7 +496,8 @@ src_install() {
 	local keepdir_list="${TENGINE_HOME_TMP}/client"
 	local module
 	for module in proxy fastcgi scgi uwsgi ; do
-		use_if_iuse tengine_static_modules_http_${module} && keepdir_list+=" ${TENGINE_HOME_TMP}/${module}"
+		use_if_iuse tengine_static_modules_http_${module} && \
+			keepdir_list+=" ${TENGINE_HOME_TMP}/${module}"
 	done
 
 	# logrotate
