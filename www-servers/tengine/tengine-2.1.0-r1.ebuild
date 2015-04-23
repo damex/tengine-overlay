@@ -558,7 +558,7 @@ src_install() {
 		if use tengine_external_modules_http_${m} ; then
 			docinto "${mod_p[$m]}"
 			for d in ${mod_doc[$m]} ; do
-			dodoc ${WORKDIR}/${mod_p[$m]}/${d} ; done
+				dodoc ${WORKDIR}/${mod_p[$m]}/${d} ; done
 		fi
 	done
 }
