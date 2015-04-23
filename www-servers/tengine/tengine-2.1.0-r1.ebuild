@@ -51,7 +51,7 @@ mod_lic["mogilefs"]="BSD"
 mod_p["mogilefs"]="${mod_pn["mogilefs"]}-${mod_pv["mogilefs"]}"
 mod_uri["mogilefs"]="https://github.com/${mod_a["mogilefs"]}/${mod_pn["mogilefs"]}/archive/${mod_pv["mogilefs"]}.tar.gz"
 mod_wd["mogilefs"]="${WORKDIR}/${mod_p["mogilefs"]}"
-mod_doc["mogilefs"]="README ChangeLog"
+mod_doc["mogilefs"]="README Changelog"
 
 # Phusion Passenger (https://github.com/phusion/passenger)
 mod_a["passenger"]="phusion"
@@ -61,7 +61,7 @@ mod_lic["passenger"]="MIT"
 mod_p["passenger"]="${mod_pn["passenger"]}-release-${mod_pv["passenger"]}"
 mod_uri["passenger"]="https://github.com/${mod_a["passenger"]}/${mod_pn["passenger"]}/archive/release-${mod_pv["passenger"]}.tar.gz"
 mod_wd["passenger"]="${WORKDIR}/${mod_p["passenger"]}/ext/nginx"
-mod_doc["passenger"]="README CHANGELOG Users\ guide\ Nginx.txt"
+mod_doc["passenger"]="README.md CHANGELOG"
 
 inherit eutils flag-o-matic perl-module ruby-ng ssl-cert toolchain-funcs user
 
@@ -557,8 +557,8 @@ src_install() {
 	for m in ${!mod_a[@]} ; do
 		if use tengine_external_modules_http_${m} ; then
 			docinto "${mod_p[$m]}"
-			for d in "${mod_doc[$m]}" ; do
-				dodoc ${d} ; done
+			for d in ${mod_doc[$m]} ; do
+			dodoc ${WORKDIR}/${mod_p[$m]}/${d} ; done
 		fi
 	done
 }
