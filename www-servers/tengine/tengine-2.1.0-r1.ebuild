@@ -17,6 +17,7 @@ declare -A mods
 mod_a["ndk"]="simpl"
 mod_pn["ndk"]="ngx_devel_kit"
 mod_pv["ndk"]="0.2.19"
+mod_lic["ndk"]="BSD"
 mod_p["ndk"]="${mod_pn["ndk"]}-${mod_pv["ndk"]}"
 mod_uri["ndk"]="https://github.com/${mod_a["ndk"]}/${mod_pn["ndk"]}/archive/v${mod_pv["ndk"]}.tar.gz"
 mod_wd["ndk"]="${WORKDIR}/${mod_p["ndk"]}"
@@ -25,6 +26,7 @@ mod_wd["ndk"]="${WORKDIR}/${mod_p["ndk"]}"
 mod_a["encrypted_session"]="openresty"
 mod_pn["encrypted_session"]="encrypted-session-nginx-module"
 mod_pv["encrypted_session"]="0.03"
+mod_lic["encrypted_session"]="BSD-2"
 mod_p["encrypted_session"]="${mod_pn["encrypted_session"]}-${mod_pv["encrypted_session"]}"
 mod_uri["encrypted_session"]="https://github.com/${mod_a["encrypted_session"]}/${mod_pn["encrypted_session"]}/archive/v${mod_pv["encrypted_session"]}.tar.gz"
 mod_wd["encrypted_session"]="${WORKDIR}/${mod_p["encrypted_session"]}"
@@ -33,6 +35,7 @@ mod_wd["encrypted_session"]="${WORKDIR}/${mod_p["encrypted_session"]}"
 mod_a["fancyindex"]="aperezdc"
 mod_pn["fancyindex"]="ngx-fancyindex"
 mod_pv["fancyindex"]="0.3.5"
+mod_lic["fancyindex"]="BSD-2"
 mod_p["fancyindex"]="${mod_pn[fancyindex]}-${mod_pv[fancyindex]}"
 mod_uri["fancyindex"]="https://github.com/${mod_a[fancyindex]}/${mod_pn[fancyindex]}/archive/v${mod_pv[fancyindex]}.tar.gz"
 mod_wd["fancyindex"]="${WORKDIR}/${mod_p[fancyindex]}"
@@ -41,6 +44,7 @@ mod_wd["fancyindex"]="${WORKDIR}/${mod_p[fancyindex]}"
 mod_a["mogilefs"]="vkholodkov"
 mod_pn["mogilefs"]="nginx-mogilefs-module"
 mod_pv["mogilefs"]="1.0.4"
+mod_lic["mogilefs"]="BSD"
 mod_p["mogilefs"]="${mod_pn["mogilefs"]}-${mod_pv["mogilefs"]}"
 mod_uri["mogilefs"]="https://github.com/${mod_a["mogilefs"]}/${mod_pn["mogilefs"]}/archive/${mod_pv["mogilefs"]}.tar.gz"
 mod_wd["mogilefs"]="${WORKDIR}/${mod_p["mogilefs"]}"
@@ -49,6 +53,7 @@ mod_wd["mogilefs"]="${WORKDIR}/${mod_p["mogilefs"]}"
 mod_a["passenger"]="phusion"
 mod_pn["passenger"]="passenger"
 mod_pv["passenger"]="5.0.6"
+mod_pv["passenger"]="MIT"
 mod_p["passenger"]="${mod_pn["passenger"]}-release-${mod_pv["passenger"]}"
 mod_uri["passenger"]="https://github.com/${mod_a["passenger"]}/${mod_pn["passenger"]}/archive/release-${mod_pv["passenger"]}.tar.gz"
 mod_wd["passenger"]="${WORKDIR}/${mod_p["passenger"]}/ext/nginx"
@@ -64,12 +69,11 @@ for m in ${!mod_a[@]} ; do
 		${mod_uri[$m]} -> ${mod_p[$m]}.tar.gz )"
 done
 
-LICENSE="BSD-2
-	tengine_external_modules_http_encrypted_session? ( BSD )
-	tengine_external_modules_http_fancyindex? ( BSD )
-	tengine_external_modules_http_mogilefs? ( BSD-2 )
-	tengine_external_modules_http_ndk? ( BSD )
-	tengine_external_modules_http_passenger? ( MIT )"
+LICENSE="BSD-2"
+
+for m in ${!mod_a[@]} ; do
+	LICENSE+=" tengine_external_modules_http_${m}? ( ${mod_lic[$m]} )"
+done
 
 RESTRICT="mirror"
 
