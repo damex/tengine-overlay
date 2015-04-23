@@ -177,18 +177,22 @@ pkg_setup() {
 	TENGINE_HOME="${EROOT}var/lib/${PN}"
 	TENGINE_HOME_TMP="${TENGINE_HOME}/tmp"
 
-	if egetent group ${PN} > /dev/null ; then
-		elog ${PN} group already exist. group creation step skipped.
+	if egetent group ${WEBSTACK_GROUP:-$PN} > /dev/null ; then
+		elog "${WEBSTACK_GROUP:-$PN} group already exist."
+		elog "group creation step skipped."
 	else
-		enewgroup ${PN} > /dev/null && \
-		elog ${PN} group created by portage.
+		enewgroup  ${WEBSTACK_GROUP:-$PN} > /dev/null && \
+		elog "${WEBSTACK_GROUP:-$PN} group created by portage."
 	fi
 
-	if egetent passwd ${PN} > /dev/null ; then
-		elog ${PN} user already exist. user creation step skipped.
+	if egetent passwd  ${WEBSTACK_USER:-$PN} > /dev/null ; then
+		elog "${WEBSTACK_USER:-$PN} user already exist."
+		elog "user creation step skipped."
 	else
-		enewuser ${PN} -1 -1 "${TENGINE_HOME}" ${PN} > /dev/null && \
-		elog ${PN} user with ${TENGINE_HOME} home created by portage.
+		enewuser ${WEBSTACK_USER:-$PN} -1 -1 "${TENGINE_HOME}" \
+			${WEBSTACK_GROUP:-$PN} > /dev/null && \
+		elog "${WEBSTACK_USER:-$PN} user with ${TENGINE_HOME} home"
+		elog "was created by portage."
 	fi
 
 	if use libatomic ; then
@@ -203,8 +207,8 @@ pkg_setup() {
 	fi
 
 	if ! use http ; then
-		ewarn "To actually disable all http-functionality you also have to disable"
-		ewarn "all tengine http modules."
+		ewarn "To actually disable all http-functionality you also have"
+		ewarn "to disable all tengine http modules."
 	fi
 
 }
@@ -393,7 +397,9 @@ src_configure() {
 	tc-export CC
 
 	if ! use prefix ; then
-		tengine_configure+=" --user=${PN} --group=${PN}"
+		tengine_configure+=" \
+			--user=${WEBSTACK_USER:-$PN} \
+			--group=${WEBSTACK_GROUP:-$PN}"
 	fi
 
 	./configure \
@@ -471,6 +477,13 @@ src_install() {
 
 	newinitd "${FILESDIR}/${PN}.initd" "${PN}"
 
+	sed -e "s;user tengine tengine;user ${WEBSTACK_USER:-$PN} ${WEBSTACK_GROUP:-$PN};" \
+		-i ${D}etc/${PN}/${PN}.conf || die
+
+	sed -e "s;user:-tengine;user:-${WEBSTACK_USER:-$PN};" \
+		-e "s;group:-tengine;group-${WEBSTACK_GROUP:-$PN};" \
+		-i ${D}etc/init.d/${PN} || die
+
 	keepdir "${EROOT}etc/${PN}"/sites-{available,enabled}
 	insinto "${EROOT}etc/${PN}/sites-available"
 	doins "${FILESDIR}/sites-available/localhost"
@@ -506,7 +519,7 @@ src_install() {
 
 	keepdir ${keepdir_list}
 	fperms 0700 ${keepdir_list}
-	fowners ${PN}:${PN} ${keepdir_list}
+	fowners ${WEBSTACK_USER:-$PN}:${WEBSTACK_GROUP:-$PN} ${keepdir_list}
 
 	if use tengine_static_modules_http_perl ; then
 		cd "${S}/objs/src/http/modules/perl"
@@ -554,7 +567,9 @@ pkg_postinst() {
 	if use ssl ; then
 		if [[ ! -f "${EROOT}etc/ssl/${PN}/${PN}.key" ]] ; then
 			install_cert /etc/ssl/${PN}/${PN}
-			use prefix || chown ${PN}:${PN} \
+			use prefix || \
+				chown \
+				${WEBSTACK_USER:-$PN}:${WEBSTACK_GROUP:-$PN} \
 				"${EROOT}etc/ssl/${PN}"/${PN}.{crt,csr,key,pem}
 		fi
 	fi
@@ -575,9 +590,10 @@ pkg_postinst() {
 	# If the tengine user can't change into or read the dir, display a warning.
 	# If su is not available we display the warning nevertheless since
 	# we can't check properly
-	su -s /bin/sh -c "cd ${EROOT}var/log/${PN} && ls" ${PN} >&/dev/null
+	su -s /bin/sh -c "cd ${EROOT}var/log/${PN} && ls" ${WEBSTACK_USER:-$PN} >&/dev/null
 	if [[ $? -ne 0 ]] ; then
-		ewarn "Please make sure that the tengine user or group has"
+		ewarn "Please make sure that the (${WEBSTACK_USER:-$PN}) user"
+		ewarn "or (${WEBSTACK_GROUP:-$PN}) group has"
 		ewarn "at least 'rx' permissions (default on fresh install)"
 		ewarn "on ${EROOT}var/log/${PN} directory."
 		ewarn "Otherwise you end up with empty log files"
