@@ -182,7 +182,7 @@ pkg_setup() {
 		elog "${WEBSTACK_GROUP:-$PN} group already exist."
 		elog "group creation step skipped."
 	else
-		enewgroup  ${WEBSTACK_GROUP:-$PN} > /dev/null && \
+		enewgroup  ${WEBSTACK_GROUP:-$PN} > /dev/null
 		elog "${WEBSTACK_GROUP:-$PN} group created by portage."
 	fi
 
@@ -191,7 +191,7 @@ pkg_setup() {
 		elog "user creation step skipped."
 	else
 		enewuser ${WEBSTACK_USER:-$PN} -1 -1 "${TENGINE_HOME}" \
-			${WEBSTACK_GROUP:-$PN} > /dev/null && \
+			${WEBSTACK_GROUP:-$PN} > /dev/null
 		elog "${WEBSTACK_USER:-$PN} user with ${TENGINE_HOME} home"
 		elog "was created by portage."
 	fi
