@@ -9,6 +9,7 @@ RUBY_OPTIONAL="yes"
 
 declare -A mod{_a,_pn,_pv,_p,_uri,_wd}
 declare -A mods
+
 # encrypted_session depend on ndk.
 # place ndk before modules that depend on it.
 
@@ -257,7 +258,7 @@ src_prepare() {
 	done
 
 	if use tengine_external_modules_http_passenger ; then
-		cd ../"${mod_p[passenger]}" ;
+		cd ../"${mod_p[passenger]}"
 
 		# Use proper toolchain-funcs methods
 		sed -e "/^CC/ s/=.*$/= '$(tc-getCC)'/" \
@@ -283,7 +284,7 @@ src_prepare() {
 			"bin/passenger-install-nginx-module" || \
 			die "Unable to remove nginx and apache2 installation scripts."
 
-		cd "${mod_wd[passenger]}" ;
+		cd "${mod_wd[passenger]}"
 		_ruby_each_implementation passenger_premake
 	fi
 }
@@ -448,10 +449,10 @@ passenger_install() {
 	cd "${mod_wd[passenger]}"
 	rake -m fakeroot \
 	NATIVE_PACKAGING_METHOD=ebuild \
-	FS_PREFIX="${EROOT}usr" \
-	FS_DATADIR="${EROOT}usr/libexec" \
-	FS_DOCDIR="${EROOT}usr/share/doc/${P}" \
-	FS_LIBDIR="${EROOT}usr/$(get_libdir)" \
+	FS_PREFIX="${EPREFIX}/usr" \
+	FS_DATADIR="${EPREFIX}/usr/libexec" \
+	FS_DOCDIR="${EPREFIX}/usr/share/doc/${P}" \
+	FS_LIBDIR="${EPREFIX}/usr/$(get_libdir)" \
 	RUBYLIBDIR="$(ruby_rbconfig_value 'archdir')" \
 	RUBYARCHDIR="$(ruby_rbconfig_value 'archdir')" \
 	|| die "Passenger installation for ${RUBY} failed!"
