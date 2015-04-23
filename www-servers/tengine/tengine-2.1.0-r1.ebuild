@@ -103,7 +103,7 @@ mods[mail]="imap pop3 smtp"
 
 IUSE="+aio +http +http-cache +pcre +poll +select +syslog
 	backtrace debug google_perftools ipv6 jemalloc libatomic luajit
-	pcre-jit rtmp rtsig ssl vim-syntax"
+	pcre-jit rtsig ssl vim-syntax"
 
 for m in ${mods[standard]} ${mods[upstream]}  ; do
 	IUSE+=" +tengine_static_modules_http_${m}" ; done
@@ -245,7 +245,7 @@ src_prepare() {
 	find auto/ -type f -print0 | \
 		xargs -0 sed -i 's;\&\& make;\&\& \\$(MAKE);' || die
 	# We have config protection, don't rename etc files
-	sed -e 's;.default;;' \
+	sed -e "s;.default;;" \
 		-i "${S}/auto/install" || die
 	# Remove useless files
 	sed -e "/koi-/d" \
@@ -258,7 +258,7 @@ src_prepare() {
 		if ! use tengine_static_modules_http_${m} && \
 			! use tengine_shared_modules_http_${m} ; then
 				sed -e "/${m}/d" \
-					-i auto/install || die
+					-i "${S}/auto/install" || die
 		fi
 	done
 
@@ -498,11 +498,11 @@ src_install() {
 	newinitd "${FILESDIR}/${PN}.initd" "${PN}"
 
 	sed -e "s;user tengine tengine;user ${WEBSTACK_USER:-$PN} ${WEBSTACK_GROUP:-$PN};" \
-		-i ${ED}etc/${PN}/${PN}.conf || die
+		-i "${ED}etc/${PN}/${PN}.conf" || die
 
 	sed -e "s;user:-tengine;user:-${WEBSTACK_USER:-$PN};" \
 		-e "s;group:-tengine;group-${WEBSTACK_GROUP:-$PN};" \
-		-i ${ED}etc/init.d/${PN} || die
+		-i "${ED}etc/init.d/${PN}" || die
 
 	keepdir "${EROOT}etc/${PN}"/sites-{available,enabled}
 	insinto "${EROOT}etc/${PN}/sites-available"
@@ -516,11 +516,9 @@ src_install() {
 	newman man/nginx.8 ${PN}.8
 	dodoc CHANGES* README
 
-	# just keepdir. do not copy the default htdocs files (bug #449136)
-	keepdir ${EROOT}var/www/localhost
-	rm -r "${ED}/usr/html" || die
+	keepdir "${EROOT}var/www/localhost"
+	rm -r "${ED}usr/html" || die
 
-	# set up a list of directories to keep
 	local keepdir_list="${TENGINE_HOME_TMP}/client"
 	local m
 	for m in proxy fastcgi scgi uwsgi ; do
