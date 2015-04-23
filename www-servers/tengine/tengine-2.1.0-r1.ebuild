@@ -76,20 +76,19 @@ RESTRICT="mirror"
 SLOT="0"
 KEYWORDS="*"
 
-mods[upstream]="upstream_check upstream_consistent_hash upstream_keepalive
-	upstream_rbtree"
+mods[upstream]="upstream_keepalive upstream_rbtree"
 
 mods[upstream_shared]="upstream_ip_hash upstream_least_conn
 	upstream_session_sticky"
 
-mods[standard]="auth_basic geo gzip proxy ssi ssl stub_status
-	${mods[upstream]}"
+mods[upstream_optional]="upstream_check upstream_consistent_hash"
+
+mods[standard]="auth_basic geo gzip proxy ssi ssl stub_status"
 
 mods[standard_shared]="access autoindex browser charset_filter empty_gif
 	fastcgi footer_filter limit_conn limit_req map memcached referer
 	reqstat rewrite scgi split_clients trim_filter userid_filter
-	user_agent uwsgi
-	${mods[upstream_shared]}"
+	user_agent uwsgi"
 
 mods[optional]="concat dav degradation gunzip gzip_static perl realip spdy"
 
@@ -102,12 +101,12 @@ IUSE="+aio +http +http-cache +pcre +poll +select +syslog
 	backtrace debug google_perftools ipv6 jemalloc libatomic luajit
 	pcre-jit rtmp rtsig ssl vim-syntax"
 
-for m in ${mods[standard]} ; do
+for m in ${mods[standard]} ${mods[upstream]}  ; do
 	IUSE+=" +tengine_static_modules_http_${m}" ; done
-for m in ${mods[standard_shared]} ; do
+for m in ${mods[standard_shared]} ${mods[upstream_shared]} ; do
 	IUSE+=" tengine_shared_modules_http_${m}
-		tengine_static_modules_http_${m}" ; done
-for m in ${mods[optional]} ; do
+		+tengine_static_modules_http_${m}" ; done
+for m in ${mods[optional]} ${mods[upstream_optional]} ; do
 	IUSE+=" tengine_static_modules_http_${m}" ; done
 for m in ${mods[optional_shared]} ; do
 	IUSE+=" tengine_shared_modules_http_${m}
@@ -165,11 +164,13 @@ PDEPEND="vim-syntax? ( app-vim/nginx-syntax )"
 REQUIRED_USE="pcre-jit? ( pcre )
 	tengine_external_modules_http_encrypted_session? ( ssl
 		tengine_external_modules_http_ndk )
+	tengine_external_modules_http_ndk? (
+		tengine_static_modules_http_rewrite
+		!tengine_shared_modules_http_rewrite )
 	tengine_shared_modules_http_fastcgi? (
 		tengine_static_modules_http_realip )
 	tengine_static_modules_http_fastcgi? (
-		tengine_static_modules_http_realip )
-"
+		tengine_static_modules_http_realip )"
 
 S="${WORKDIR}/${P}"
 
@@ -310,10 +311,12 @@ src_configure() {
 
 	use syslog || tengine_configure+=" --without-syslog"
 
-	for m in ${mods[standard]} ${mods[standard_shared]} \
+	for m in ${mods[upstream]}  ${mods[upstream_shared]} \
+		${mods[upstream_optional]} \
+		${mods[standard]} ${mods[standard_shared]} \
 		${mods[optional]} ${mods[optional_shared]} ; do
 
-		! use_if_iuse "tengine_shared_modules_http_${m}" && \
+		use_if_iuse "tengine_shared_modules_http_${m}" && \
 		use_if_iuse "tengine_static_modules_http_${m}" && \
 		static_and_shared+=" ${m}"
 
@@ -325,8 +328,8 @@ src_configure() {
 		! use_if_iuse "tengine_shared_modules_http_${m}" && \
 		static_only+=" ${m}"
 
-		! use_if_iuse "tengine_static_modules_http_${m}" && \
 		! use_if_iuse "tengine_shared_modules_http_${m}" && \
+		! use_if_iuse "tengine_static_modules_http_${m}" && \
 		disabled+=" ${m}"
 	done
 
@@ -343,24 +346,39 @@ src_configure() {
 	einfo "These modules will be disabled:"
 	einfo "${disabled}"
 
-	sleep 10
-
 	for m in $shared_only $shared_and_static ; do
 		http_enabled=1
 		tengine_configure+=" --with-http_${m}_module=shared"
 	done
 
 	for m in $static_only ; do
-		grep ${m} <<< ${mods[standard{,_shared}]} && \
+		egrep -q "\b${m}\b" <<< ${mods[upstream]} && \
 			http_enabled=1
 
-		grep ${m} <<< ${mods[{optional{,_shared}]} && \
+		egrep -q "\b${m}\b" <<< ${mods[upstream_shared]} && \
+			http_enabled=1
+
+		egrep -q "\b${m}\b" <<< ${mods[upstream_optional]} && \
+			http_enabled=1 && \
+			tengine_configure+=" --with-http_${m}_module"
+
+		egrep -q "\b${m}\b" <<< ${mods[standard]} && \
+			http_enabled=1
+
+		egrep -q "\b${m}\b" <<< ${mods[standard_shared]} && \
+			http_enabled=1
+
+		egrep -q "\b${m}\b" <<< ${mods[optional]} && \
+			http_enabled=1 && \
+			tengine_configure+=" --with-http_${m}_module"
+
+		egrep -q "\b${m}\b" <<< ${mods[optional_shared]} && \
 			http_enabled=1 && \
 			tengine_configure+=" --with-http_${m}_module"
 	done
 
 	for m in $disabled ; do
-		grep ${m} <<< ${mods[{standard,_shared}]} && \
+		egrep -q "\b${m}\b" <<< ${mods[{standard,_shared}]} && \
 			tengine_configure+=" --without-http_${m}_module"
 	done
 
@@ -470,7 +488,7 @@ src_install() {
 			-i "${S}/objs/dso_tool" || die
 	fi
 
-	emake DESTDIR="${D}" install
+	emake DESTDIR="${ED}" install
 
 	insinto "${EROOT}etc/${PN}"
 	doins "${FILESDIR}/${PN}.conf"
@@ -478,11 +496,11 @@ src_install() {
 	newinitd "${FILESDIR}/${PN}.initd" "${PN}"
 
 	sed -e "s;user tengine tengine;user ${WEBSTACK_USER:-$PN} ${WEBSTACK_GROUP:-$PN};" \
-		-i ${D}etc/${PN}/${PN}.conf || die
+		-i ${ED}etc/${PN}/${PN}.conf || die
 
 	sed -e "s;user:-tengine;user:-${WEBSTACK_USER:-$PN};" \
 		-e "s;group:-tengine;group-${WEBSTACK_GROUP:-$PN};" \
-		-i ${D}etc/init.d/${PN} || die
+		-i ${ED}etc/init.d/${PN} || die
 
 	keepdir "${EROOT}etc/${PN}"/sites-{available,enabled}
 	insinto "${EROOT}etc/${PN}/sites-available"
@@ -498,7 +516,7 @@ src_install() {
 
 	# just keepdir. do not copy the default htdocs files (bug #449136)
 	keepdir ${EROOT}var/www/localhost
-	rm -r "${D}/usr/html" || die
+	rm -r "${ED}/usr/html" || die
 
 	# set up a list of directories to keep
 	local keepdir_list="${TENGINE_HOME_TMP}/client"
@@ -523,7 +541,7 @@ src_install() {
 
 	if use tengine_static_modules_http_perl ; then
 		cd "${S}/objs/src/http/modules/perl"
-		einstall DESTDIR="${D}" INSTALLDIRS=vendor
+		emake DESTDIR="${ED}" INSTALLDIRS=vendor install
 		perl_delete_localpod
 	fi
 
