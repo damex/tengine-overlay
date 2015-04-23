@@ -36,9 +36,9 @@ mod_a["fancyindex"]="aperezdc"
 mod_pn["fancyindex"]="ngx-fancyindex"
 mod_pv["fancyindex"]="0.3.5"
 mod_lic["fancyindex"]="BSD-2"
-mod_p["fancyindex"]="${mod_pn[fancyindex]}-${mod_pv[fancyindex]}"
-mod_uri["fancyindex"]="https://github.com/${mod_a[fancyindex]}/${mod_pn[fancyindex]}/archive/v${mod_pv[fancyindex]}.tar.gz"
-mod_wd["fancyindex"]="${WORKDIR}/${mod_p[fancyindex]}"
+mod_p["fancyindex"]="${mod_pn["fancyindex"]}-${mod_pv["fancyindex"]}"
+mod_uri["fancyindex"]="https://github.com/${mod_a["fancyindex"]}/${mod_pn["fancyindex"]}/archive/v${mod_pv["fancyindex"]}.tar.gz"
+mod_wd["fancyindex"]="${WORKDIR}/${mod_p["fancyindex"]}"
 
 # MogileFS Client (http://www.grid.net.ru/nginx/mogilefs.en.html)
 mod_a["mogilefs"]="vkholodkov"
