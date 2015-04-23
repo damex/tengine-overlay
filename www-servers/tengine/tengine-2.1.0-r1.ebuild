@@ -373,6 +373,8 @@ src_configure() {
 			tengine_configure+=" --with-http_${m}_module"
 	done
 
+	sleep 10
+
 	for m in $disabled ; do
 		egrep -q "\b${m}\b" <<< ${mods[{standard,_shared}]} && \
 			tengine_configure+=" --without-http_${m}_module"
