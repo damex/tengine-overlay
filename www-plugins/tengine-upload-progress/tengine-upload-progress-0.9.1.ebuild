@@ -16,7 +16,7 @@ LICENSE="BSD-2"
 KEYWORDS="*"
 IUSE=""
 
-RDEPEND="www-servers/tengine[dso]"
+RDEPEND="www-servers/tengine"
 DEPEND="${RDEPEND}"
 
 S="${WORKDIR}/nginx-${MY_PN}-module-${PV}"
