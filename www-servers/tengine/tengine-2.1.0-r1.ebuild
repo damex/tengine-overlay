@@ -7,7 +7,7 @@ GENTOO_DEPEND_ON_PERL="no"
 USE_RUBY="ruby19 ruby20 ruby21 ruby22"
 RUBY_OPTIONAL="yes"
 
-declare -A mod{_a,_pn,_pv,_lic,_p,_uri,_wd}
+declare -A mod{_a,_pn,_pv,_lic,_p,_uri,_wd,_doc}
 declare -A mods
 
 # encrypted_session depend on ndk.
@@ -21,6 +21,7 @@ mod_lic["ndk"]="BSD"
 mod_p["ndk"]="${mod_pn["ndk"]}-${mod_pv["ndk"]}"
 mod_uri["ndk"]="https://github.com/${mod_a["ndk"]}/${mod_pn["ndk"]}/archive/v${mod_pv["ndk"]}.tar.gz"
 mod_wd["ndk"]="${WORKDIR}/${mod_p["ndk"]}"
+mod_doc["ndk"]="README README_AUTO_LIB"
 
 # Encrypted Session (https://github.com/openresty/encrypted-session-nginx-module)
 mod_a["encrypted_session"]="openresty"
@@ -30,6 +31,7 @@ mod_lic["encrypted_session"]="BSD-2"
 mod_p["encrypted_session"]="${mod_pn["encrypted_session"]}-${mod_pv["encrypted_session"]}"
 mod_uri["encrypted_session"]="https://github.com/${mod_a["encrypted_session"]}/${mod_pn["encrypted_session"]}/archive/v${mod_pv["encrypted_session"]}.tar.gz"
 mod_wd["encrypted_session"]="${WORKDIR}/${mod_p["encrypted_session"]}"
+mod_doc["encrypted_session"]="README"
 
 # Fancy Index (https://github.com/aperezdc/ngx-fancyindex)
 mod_a["fancyindex"]="aperezdc"
@@ -39,6 +41,7 @@ mod_lic["fancyindex"]="BSD-2"
 mod_p["fancyindex"]="${mod_pn["fancyindex"]}-${mod_pv["fancyindex"]}"
 mod_uri["fancyindex"]="https://github.com/${mod_a["fancyindex"]}/${mod_pn["fancyindex"]}/archive/v${mod_pv["fancyindex"]}.tar.gz"
 mod_wd["fancyindex"]="${WORKDIR}/${mod_p["fancyindex"]}"
+mod_doc["fancyindex"]="README.rst HACKING.md CHANGELOG.md"
 
 # MogileFS Client (http://www.grid.net.ru/nginx/mogilefs.en.html)
 mod_a["mogilefs"]="vkholodkov"
@@ -48,6 +51,7 @@ mod_lic["mogilefs"]="BSD"
 mod_p["mogilefs"]="${mod_pn["mogilefs"]}-${mod_pv["mogilefs"]}"
 mod_uri["mogilefs"]="https://github.com/${mod_a["mogilefs"]}/${mod_pn["mogilefs"]}/archive/${mod_pv["mogilefs"]}.tar.gz"
 mod_wd["mogilefs"]="${WORKDIR}/${mod_p["mogilefs"]}"
+mod_doc["mogilefs"]="README ChangeLog"
 
 # Phusion Passenger (https://github.com/phusion/passenger)
 mod_a["passenger"]="phusion"
@@ -57,6 +61,7 @@ mod_lic["passenger"]="MIT"
 mod_p["passenger"]="${mod_pn["passenger"]}-release-${mod_pv["passenger"]}"
 mod_uri["passenger"]="https://github.com/${mod_a["passenger"]}/${mod_pn["passenger"]}/archive/release-${mod_pv["passenger"]}.tar.gz"
 mod_wd["passenger"]="${WORKDIR}/${mod_p["passenger"]}/ext/nginx"
+mod_doc["passenger"]="README CHANGELOG Users\ guide\ Nginx.txt"
 
 inherit eutils flag-o-matic perl-module ruby-ng ssl-cert toolchain-funcs user
 
@@ -545,24 +550,17 @@ src_install() {
 		perl_delete_localpod
 	fi
 
-	if use tengine_external_modules_http_encrypted_session ; then
-		docinto "${mod_p[encrypted_session]}"
-		dodoc "${mod_wd[encrypted_session]}/README"
-	fi
-
-	if use tengine_external_modules_http_fancyindex ; then
-		docinto "${mod_p[fancyindex]}"
-		dodoc "${mod_wd[fancyindex]}/README.rst"
-	fi
-
-	if use tengine_external_modules_http_ndk ; then
-		docinto "${mod_p[ndk]}"
-		dodoc "${mod_wd[ndk]}/README"
-	fi
-
 	if use tengine_external_modules_http_passenger ; then
 		_ruby_each_implementation passenger_install
 	fi
+
+	for m in ${!mod_a[@]} ; do
+		if use tengine_external_modules_http_${m} ; then
+			docinto "${mod_p[$m]}"
+			for d in "${mod_doc[$m]}" ; do
+				dodoc ${d} ; done
+		fi
+	done
 }
 
 pkg_preinst() {
