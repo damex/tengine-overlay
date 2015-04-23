@@ -166,11 +166,7 @@ REQUIRED_USE="pcre-jit? ( pcre )
 		tengine_external_modules_http_ndk )
 	tengine_external_modules_http_ndk? (
 		tengine_static_modules_http_rewrite
-		!tengine_shared_modules_http_rewrite )
-	tengine_shared_modules_http_fastcgi? (
-		tengine_static_modules_http_realip )
-	tengine_static_modules_http_fastcgi? (
-		tengine_static_modules_http_realip )"
+		!tengine_shared_modules_http_rewrite )"
 
 S="${WORKDIR}/${P}"
 
