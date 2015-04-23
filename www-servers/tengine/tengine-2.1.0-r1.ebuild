@@ -7,7 +7,7 @@ GENTOO_DEPEND_ON_PERL="no"
 USE_RUBY="ruby19 ruby20 ruby21 ruby22"
 RUBY_OPTIONAL="yes"
 
-declare -A mod{_a,_pn,_pv,_p,_uri,_wd}
+declare -A mod{_a,_pn,_pv,_lic,_p,_uri,_wd}
 declare -A mods
 
 # encrypted_session depend on ndk.
