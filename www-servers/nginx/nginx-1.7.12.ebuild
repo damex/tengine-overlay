@@ -186,7 +186,7 @@ mod_pn["accept_language"]="nginx_accept_language_module"
 mod_pv["accept_language"]=""
 mod_lic["accept_language"]="BSD-2"
 mod_sha["accept_language"]="2f69842f83dac77f7d98b41a2b31b13b87aeaba7"
-mod_p["accept_language"]="${mod_pn["accept_language"]}-${mod_pv["accept_language"]}"
+mod_p["accept_language"]="${mod_pn["accept_language"]}-${mod_sha["accept_language"]}"
 mod_uri["accept_language"]="https://github.com/${mod_a["accept_language"]}/${mod_pn["accept_language"]}/archive/${mod_sha["accept_language"]}.tar.gz"
 mod_wd["accept_language"]="${WORKDIR}/${mod_p["accept_language"]}"
 mod_doc["accept_language"]="README.textile"
@@ -245,9 +245,10 @@ mod_doc["push_stream"]="README.textile CHANGELOG.textile AUTHORS"
 mod_a["sticky"]="nginx-goodies"
 mod_pn["sticky"]="nginx-sticky-module-ng"
 mod_pv["sticky"]="1.2.5"
+mod_sha["sticky"]="bd312d586752"
 mod_lic["sticky"]="BSD-2"
-mod_p["sticky"]="${mod_pn["sticky"]}-${mod_pv["sticky"]}"
-mod_uri["sticky"]="http://bitbucket.org/${mod_a["sticky"]}/${mod_pn["sticky"]}/get/${mod_pv["sticky"]}.tar.gz"
+mod_p["sticky"]="${mod_a["sticky"]}-${mod_pn["sticky"]}-${mod_sha["sticky"]}"
+mod_uri["sticky"]="http://bitbucket.org/${mod_a["sticky"]}/${mod_pn["sticky"]}/get/${mod_sha["sticky"]}.tar.gz"
 mod_wd["sticky"]="${WORKDIR}/${mod_p["sticky"]}"
 mod_doc["sticky"]="README.md Changelog.txt"
 
@@ -440,7 +441,7 @@ src_configure() {
 		./configure \
 			--enable-standalone-module \
 			$(use_enable pcre-jit) \
-			$(use_with nginx_modules_http_lua lua) || die "configure failed for modsecurity"
+			$(use_with nginx_modules_external_lua lua) || die "configure failed for modsecurity"
 	fi
 
 	cd "${S}"
