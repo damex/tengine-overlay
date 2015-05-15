@@ -114,9 +114,10 @@ mod_doc["slowfs_cache"]="README.md CHANGES"
 mod_a["lua"]="openresty"
 mod_pn["lua"]="lua-nginx-module"
 mod_pv["lua"]="0.9.16rc1"
+mod_sha["lua"]="5b35451cd103bda49873af54d9448587203d51bf"
 mod_lic["lua"]="BSD-2"
-mod_p["lua"]="${mod_pn["lua"]}-${mod_pv["lua"]}"
-mod_uri["lua"]="https://github.com/${mod_a["lua"]}/${mod_pn["lua"]}/archive/v${mod_pv["lua"]}.tar.gz"
+mod_p["lua"]="${mod_pn["lua"]}-${mod_sha["lua"]}"
+mod_uri["lua"]="https://github.com/${mod_a["lua"]}/${mod_pn["lua"]}/archive/${mod_sha["lua"]}.tar.gz"
 mod_wd["lua"]="${WORKDIR}/${mod_p["lua"]}"
 mod_doc["lua"]="README.markdown Changes"
 
@@ -228,7 +229,7 @@ mod_pv["modsecurity"]="2.9.0"
 mod_lic["modsecurity"]="Apache-2.0"
 mod_p["modsecurity"]="${mod_pn["modsecurity"]}-${mod_pv["modsecurity"]}"
 mod_uri["modsecurity"]="https://www.modsecurity.org/tarball/${mod_pv[modsecurity]}/${mod_p["modsecurity"]}.tar.gz"
-mod_wd["modsecurity"]="${WORKDIR}/${mod_p["modsecurity"]}"
+mod_wd["modsecurity"]="${WORKDIR}/${mod_p["modsecurity"]}/nginx/${mod_pn["modsecurity"]}"
 mod_doc["modsecurity"]="README.TXT CHANGES"
 
 # Push Stream (https://github.com/wandenberg/nginx-push-stream-module)
@@ -256,9 +257,10 @@ mod_doc["sticky"]="README.md Changelog.txt"
 mod_a["ajp"]="yaoweibin"
 mod_pn["ajp"]="nginx_ajp_module"
 mod_pv["ajp"]="0.3.0"
+mod_sha["ajp"]="bf6cd93f2098b59260de8d494f0f4b1f11a84627"
 mod_lic["ajp"]="BSD-2"
-mod_p["ajp"]="${mod_pn["ajp"]}-${mod_pv["ajp"]}"
-mod_uri["ajp"]="https://github.com/${mod_a["ajp"]}/${mod_pn["ajp"]}/archive/v${mod_pv["ajp"]}.tar.gz"
+mod_p["ajp"]="${mod_pn["ajp"]}-${mod_sha["ajp"]}"
+mod_uri["ajp"]="https://github.com/${mod_a["ajp"]}/${mod_pn["ajp"]}/archive/${mod_sha["ajp"]}.tar.gz"
 mod_wd["ajp"]="${WORKDIR}/${mod_p["ajp"]}"
 mod_doc["ajp"]="README"
 
@@ -431,7 +433,7 @@ src_prepare() {
 src_configure() {
 	# modsecurity needs to generate nginx/modsecurity/config before including it
 	if use nginx_modules_external_modsecurity; then
-		cd "${mod_wd[modsecurity]}"
+		cd "${WORKDIR}/${mod_p[modsecurity]}"
 		if use luajit ; then
 			sed -i \
 				-e 's|^\(LUA_PKGNAMES\)=.*|\1="luajit"|' \
@@ -480,7 +482,7 @@ src_configure() {
 	for m in ${!mod_a[@]} ; do
 		use nginx_modules_external_${m} && \
 			http_enabled=1 && \
-			tengine_configure+=" --add-module=${mod_wd[$m]}"
+			nginx_configure+=" --add-module=${mod_wd[$m]}"
 	done
 
 	if use nginx_modules_external_lua ; then
@@ -493,12 +495,6 @@ src_configure() {
 			export LUA_INC=$(pkg-config --variable includedir lua)
 		fi
 		nginx_configure+=" --add-module=${mod_wd[lua]}"
-	fi
-
-	if use nginx_modules_external_modsecurity ; then
-		http_enabled=1
-		nginx_configure+=" --add-module=${mod_wd[modsecurity]}/nginx/modsecurity"
-	#	CFLAGS="$CFLAGS -I /usr/include/apr-1"
 	fi
 
 	if use http || use http-cache ; then
@@ -563,7 +559,7 @@ src_configure() {
 }
 
 src_compile() {
-	use nginx_modules_external_modsecurity && emake -C "${mod_wd[modsecurity]}"
+	use nginx_modules_external_modsecurity && emake -C "${WORKDIR}/${mod_p[modsecurity]}"
 
 	# https://bugs.gentoo.org/286772
 	export LANG=C LC_ALL=C
@@ -661,7 +657,7 @@ pkg_postinst() {
 	einfo "and then do relogin to your system to ensure that the new max"
 	einfo "open file limits are active. Then try restarting nginx again."
 
-	# If the tengine user can't change into or read the dir, display a warning.
+	# If the nginx user can't change into or read the dir, display a warning.
 	# If su is not available we display the warning nevertheless since
 	# we can't check properly
 	su -s /bin/sh -c "cd ${EROOT}var/log/${PN} && ls" ${PN} >&/dev/null
