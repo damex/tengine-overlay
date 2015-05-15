@@ -494,7 +494,6 @@ src_configure() {
 			export LUA_LIB=$(pkg-config --variable libdir lua)
 			export LUA_INC=$(pkg-config --variable includedir lua)
 		fi
-		nginx_configure+=" --add-module=${mod_wd[lua]}"
 	fi
 
 	if use http || use http-cache ; then
