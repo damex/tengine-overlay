@@ -56,7 +56,7 @@ mod_doc["mogilefs"]="README Changelog"
 # Phusion Passenger (https://github.com/phusion/passenger)
 mod_a["passenger"]="phusion"
 mod_pn["passenger"]="passenger"
-mod_pv["passenger"]="5.0.6"
+mod_pv["passenger"]="5.0.7"
 mod_lic["passenger"]="MIT"
 mod_p["passenger"]="${mod_pn["passenger"]}-release-${mod_pv["passenger"]}"
 mod_uri["passenger"]="https://github.com/${mod_a["passenger"]}/${mod_pn["passenger"]}/archive/release-${mod_pv["passenger"]}.tar.gz"
