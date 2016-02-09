@@ -26,7 +26,7 @@ mod_doc["ndk"]="README README_AUTO_LIB"
 # Encrypted Session (https://github.com/openresty/encrypted-session-nginx-module)
 mod_a["encrypted_session"]="openresty"
 mod_pn["encrypted_session"]="encrypted-session-nginx-module"
-mod_pv["encrypted_session"]="0.03"
+mod_pv["encrypted_session"]="0.04"
 mod_lic["encrypted_session"]="BSD-2"
 mod_p["encrypted_session"]="${mod_pn["encrypted_session"]}-${mod_pv["encrypted_session"]}"
 mod_uri["encrypted_session"]="https://github.com/${mod_a["encrypted_session"]}/${mod_pn["encrypted_session"]}/archive/v${mod_pv["encrypted_session"]}.tar.gz"
