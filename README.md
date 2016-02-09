@@ -1,7 +1,7 @@
 tengine-overlay
 ===============
  
-The `tengine-overlay` overlay is designed to be used with `Funtoo Linux`, however, ebuilds from this overlay can be used on any modern Gentoo Linux based derivative.
+The `tengine-overlay` overlay is designed to be used with `Gentoo Linux`, however, ebuilds from this overlay can be used on any modern Gentoo Linux based derivative.
 
 Layman users can add `tengine-overlay` overlay using the following command:
 
