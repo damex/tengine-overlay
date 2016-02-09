@@ -56,11 +56,11 @@ mod_doc["mogilefs"]="README Changelog"
 # Phusion Passenger (https://github.com/phusion/passenger)
 mod_a["passenger"]="phusion"
 mod_pn["passenger"]="passenger"
-mod_pv["passenger"]="5.0.16"
+mod_pv["passenger"]="5.0.24"
 mod_lic["passenger"]="MIT"
 mod_p["passenger"]="${mod_pn["passenger"]}-release-${mod_pv["passenger"]}"
 mod_uri["passenger"]="https://github.com/${mod_a["passenger"]}/${mod_pn["passenger"]}/archive/release-${mod_pv["passenger"]}.tar.gz"
-mod_wd["passenger"]="${WORKDIR}/${mod_p["passenger"]}/ext/nginx"
+mod_wd["passenger"]="${WORKDIR}/${mod_p["passenger"]}/src/nginx_module"
 mod_doc["passenger"]="README.md CHANGELOG"
 
 inherit eutils flag-o-matic perl-module ruby-ng ssl-cert toolchain-funcs user
@@ -271,31 +271,41 @@ src_prepare() {
 		cd ../"${mod_p[passenger]}"
 
 		# Use proper toolchain-funcs methods
-		sed -e "/^CC/ s/=.*$/= '$(tc-getCC)'/" \
-			-e "/^CXX/ s/=.*$/= '$(tc-getCXX)'/" \
-			-i "build/basics.rb" || die
+		#sed -e "/^CC/ s/=.*$/= '$(tc-getCC)'/" \
+		#	-e "/^CXX/ s/=.*$/= '$(tc-getCXX)'/" \
+		#	-i "build/basics.rb" || die
 
 		# Fix hard-coded use of AR
-		sed -e "s;ar cru;"$(tc-getAR)" cru;" \
-			-i "build/cplusplus_support.rb" || die
+		#sed -e "s;ar cru;"$(tc-getAR)" cru;" \
+		#	-i "build/cplusplus_support.rb" || die
 
 		epatch "${FILESDIR}"/passenger/passenger-contenthandler.patch
 		epatch "${FILESDIR}"/passenger/passenger-gentoo.patch
 		epatch "${FILESDIR}"/passenger/passenger-ldflags.patch
 
-		sed -e "s;/buildout/agents;/agents;" \
-			-i "ext/common/ResourceLocator.h" || die
+		sed -r \
+			-e "s:/buildout(/support-binaries):\1:" \
+			-i "src/cxx_supportlib/ResourceLocator.h" || die
+
+		sed -e 's#local/include#include#' \
+			-i "src/ruby_supportlib/phusion_passenger/platform_info/cxx_portability.rb" || die
 
 		sed -e '/passenger-install-apache2-module/d' \
 			-e "/passenger-install-nginx-module/d" \
-			-i "lib/phusion_passenger/packaging.rb" || die
+			-i "src/ruby_supportlib/phusion_passenger/packaging.rb" || die
+
+		#sed -r \
+		#	-e 's#(LIBEV_CFLAGS =).*#\1 "-I/usr/include"#' \
+		#	-e 's#(LIBUV_CFLAGS =).*#\1 "-I/usr/include"#' \
+		#	-i "build/common_library.rb" || die
 
 		rm "bin/passenger-install-apache2-module" \
 			"bin/passenger-install-nginx-module" || \
 			die "Unable to remove nginx and apache2 installation scripts."
+		rm -r "src/apache2_module"
 
-		cd "${mod_wd[passenger]}"
-		_ruby_each_implementation passenger_premake
+		#cd "${mod_wd[passenger]}"
+		#_ruby_each_implementation passenger_premake
 	fi
 }
 
@@ -453,6 +463,10 @@ src_configure() {
 	# troubleshoot and question the user setup.
 	sed -e "s;${WORKDIR};external_module;g" \
 		-i "${S}/objs/ngx_auto_config.h" || die
+
+	# passenger --add-module fix to take even less space
+	use tengine_external_modules_http_passenger && \
+		sed -i -e "s|/${P}/|/|g;s|/src/nginx_module||g" objs/ngx_auto_config.h
 }
 
 src_compile() {
@@ -461,19 +475,19 @@ src_compile() {
 	emake LINK="${CC} ${LDFLAGS}" OTHERLDFLAGS="${LDFLAGS}"
 }
 
-passenger_premake() {
-	# Dirty spike to make passenger compilation each-ruby compatible
-	mkdir -p "${S}"
-	cp -r "${mod_p[passenger]}" "${S}"
-	cp -r "${PN}-${PV}" "${S}"
-	cd "${S}/${mod_p[passenger]}"
-	sed -e "s;#{PlatformInfo.ruby_command};${RUBY};g" \
-		-i "build/ruby_extension.rb" \
-		-i "lib/phusion_passenger/native_support.rb" || die
-	append-cflags $(test-flags-CC -fno-strict-aliasing -Wno-unused-result)
-	append-cxxflags $(test-flags-CXX -fno-strict-aliasing -Wno-unused-result -fPIC)
-	rake -m nginx || die "Passenger premake for ${RUBY} failed!"
-}
+#passenger_premake() {
+#	# Dirty spike to make passenger compilation each-ruby compatible
+#	mkdir -p "${S}"
+#	cp -r "${mod_p[passenger]}" "${S}"
+#	cp -r "${PN}-${PV}" "${S}"
+#	cd "${S}/${mod_p[passenger]}"
+#	sed -e "s;#{PlatformInfo.ruby_command};${RUBY};g" \
+#		-i "build/ruby_extension.rb" \
+#		-i "lib/phusion_passenger/native_support.rb" || die
+#	append-cflags $(test-flags-CC -fno-strict-aliasing -Wno-unused-result)
+#	append-cxxflags $(test-flags-CXX -fno-strict-aliasing -Wno-unused-result -fPIC)
+#	rake -m nginx || die "Passenger premake for ${RUBY} failed!"
+#}
 
 passenger_install() {
 	# Dirty spike to make passenger installation each-ruby compatible
