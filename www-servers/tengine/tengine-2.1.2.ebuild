@@ -1,5 +1,6 @@
 # Distributed under the terms of the GNU General Public License v2
 
+# ruby eclasses does not support EAPI 6 or higher
 EAPI="5"
 
 GENTOO_DEPEND_ON_PERL="no"
