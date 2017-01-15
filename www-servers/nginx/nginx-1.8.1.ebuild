@@ -13,12 +13,12 @@ declare -A mods
 # Nginx Development Kit (NDK) (https://github.com/simpl/ngx_devel_kit)
 mod_a["ndk"]="simpl"
 mod_pn["ndk"]="ngx_devel_kit"
-mod_pv["ndk"]="0.2.19"
+mod_pv["ndk"]="0.3.0"
 mod_lic["ndk"]="BSD"
 mod_p["ndk"]="${mod_pn["ndk"]}-${mod_pv["ndk"]}"
 mod_uri["ndk"]="https://github.com/${mod_a["ndk"]}/${mod_pn["ndk"]}/archive/v${mod_pv["ndk"]}.tar.gz"
 mod_wd["ndk"]="${WORKDIR}/${mod_p["ndk"]}"
-mod_doc["ndk"]="README README_AUTO_LIB"
+mod_doc["ndk"]="README.md README_AUTO_LIB"
 
 # Encrypted Session (https://github.com/openresty/encrypted-session-nginx-module)
 mod_a["encrypted_session"]="openresty"
