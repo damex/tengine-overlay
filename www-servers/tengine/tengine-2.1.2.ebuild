@@ -517,7 +517,7 @@ src_install() {
 	newinitd "${FILESDIR}/${PN}.initd" "${PN}"
 
 	if use systemd ; then
-		systemd_newunit "${FILESDIR}"/tengine.service
+		systemd_newunit "${FILESDIR}/${PN}.service" "${PN}.service"
 	fi
 
 	keepdir "${EROOT}etc/${PN}"/sites-{available,enabled}
