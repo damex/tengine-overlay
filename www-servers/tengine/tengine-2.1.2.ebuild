@@ -4,7 +4,7 @@ EAPI="5"
 
 GENTOO_DEPEND_ON_PERL="no"
 # Passenger have support for jruby and rbx
-USE_RUBY="ruby19 ruby20 ruby21 ruby22"
+USE_RUBY="ruby19 ruby20 ruby21 ruby22 ruby23 ruby24"
 RUBY_OPTIONAL="yes"
 
 declare -A mod{_a,_pn,_pv,_lic,_p,_uri,_wd,_doc}
