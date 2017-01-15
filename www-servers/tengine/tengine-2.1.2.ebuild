@@ -63,7 +63,7 @@ mod_uri["passenger"]="https://github.com/${mod_a["passenger"]}/${mod_pn["passeng
 mod_wd["passenger"]="${WORKDIR}/${mod_p["passenger"]}/src/nginx_module"
 mod_doc["passenger"]="README.md CHANGELOG"
 
-inherit eutils flag-o-matic perl-module ruby-ng ssl-cert toolchain-funcs user
+inherit eutils flag-o-matic perl-module ruby-ng ssl-cert systemd toolchain-funcs user
 
 DESCRIPTION="Robust, small and high performance http and reverse proxy server"
 HOMEPAGE="http://tengine.taobao.org"
@@ -108,7 +108,7 @@ mods[mail]="imap pop3 smtp"
 
 IUSE="+aio +http +http-cache +pcre +poll +select +syslog
 	backtrace debug google_perftools ipv6 jemalloc libatomic luajit
-	pcre-jit rtsig ssl vim-syntax"
+	pcre-jit rtsig ssl systemd vim-syntax"
 
 for m in ${mods[standard]} ${mods[upstream]}  ; do
 	IUSE+=" +tengine_static_modules_http_${m}" ; done
@@ -515,6 +515,10 @@ src_install() {
 	doins "${FILESDIR}/${PN}.conf"
 
 	newinitd "${FILESDIR}/${PN}.initd" "${PN}"
+
+	if use systemd ; then
+		systemd_newunit "${FILESDIR}"/tengine.service
+	fi
 
 	keepdir "${EROOT}etc/${PN}"/sites-{available,enabled}
 	insinto "${EROOT}etc/${PN}/sites-available"
