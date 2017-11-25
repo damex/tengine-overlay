@@ -76,7 +76,7 @@ mods[standard_shared]="access autoindex browser charset_filter empty_gif
 	reqstat rewrite scgi split_clients trim_filter userid_filter
 	user_agent uwsgi"
 
-mods[optional]="concat dav degradation gunzip gzip_static perl realip spdy"
+mods[optional]="concat dav degradation gunzip gzip_static perl realip v2"
 
 mods[optional_shared]="addition flv geoip image_filter lua mp4 random_index
 	secure_link slice tfs sub sysguard xslt"
@@ -129,7 +129,7 @@ RDEPEND="http-cache? ( dev-libs/openssl )
 	tengine_static_modules_http_perl? ( dev-lang/perl )
 	tengine_static_modules_http_rewrite? ( dev-libs/libpcre )
 	tengine_static_modules_http_secure_link? ( dev-libs/openssl )
-	tengine_static_modules_http_spdy? ( dev-libs/openssl )
+	tengine_static_modules_http_v2? ( dev-libs/openssl )
 	tengine_static_modules_http_tfs? ( dev-libs/yajl )
 	tengine_static_modules_http_xslt? ( dev-libs/libxml2
 		dev-libs/libxslt )"
