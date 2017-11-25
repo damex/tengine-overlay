@@ -185,7 +185,7 @@ pkg_setup() {
 }
 
 src_prepare() {
-	epatch "${FILESDIR}/${PN}-fix-perl-install-path.patch"
+	eapply "${FILESDIR}/${PN}-fix-perl-install-path.patch"
 
 	sed -e "s;NGX_CONF_PREFIX/nginx.conf;NGX_CONF_PREFIX/tengine.conf;" \
 		-i "${S}/auto/install" || die
