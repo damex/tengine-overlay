@@ -44,16 +44,6 @@ mod_uri["fancyindex"]="https://github.com/${mod_a["fancyindex"]}/${mod_pn["fancy
 mod_wd["fancyindex"]="${WORKDIR}/${mod_p["fancyindex"]}"
 mod_doc["fancyindex"]="README.rst HACKING.md CHANGELOG.md"
 
-# MogileFS Client (http://www.grid.net.ru/nginx/mogilefs.en.html)
-mod_a["mogilefs"]="vkholodkov"
-mod_pn["mogilefs"]="nginx-mogilefs-module"
-mod_pv["mogilefs"]="1.0.4"
-mod_lic["mogilefs"]="BSD"
-mod_p["mogilefs"]="${mod_pn["mogilefs"]}-${mod_pv["mogilefs"]}"
-mod_uri["mogilefs"]="https://github.com/${mod_a["mogilefs"]}/${mod_pn["mogilefs"]}/archive/${mod_pv["mogilefs"]}.tar.gz"
-mod_wd["mogilefs"]="${WORKDIR}/${mod_p["mogilefs"]}"
-mod_doc["mogilefs"]="README Changelog"
-
 # Phusion Passenger (https://github.com/phusion/passenger)
 mod_a["passenger"]="phusion"
 mod_pn["passenger"]="passenger"
