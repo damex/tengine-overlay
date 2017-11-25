@@ -40,7 +40,7 @@ mod_uri["fancyindex"]="https://github.com/${mod_a["fancyindex"]}/${mod_pn["fancy
 mod_wd["fancyindex"]="${WORKDIR}/${mod_p["fancyindex"]}"
 mod_doc["fancyindex"]="README.rst HACKING.md CHANGELOG.md"
 
-inherit eutils flag-o-matic perl-module ssl-cert systemd toolchain-funcs user
+inherit eutils perl-module ssl-cert systemd toolchain-funcs user
 
 DESCRIPTION="Robust, small and high performance http and reverse proxy server"
 HOMEPAGE="http://tengine.taobao.org"
