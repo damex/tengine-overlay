@@ -1,5 +1,7 @@
 tengine-overlay
 ===============
+
+[![Build Status](https://travis-ci.org/damex/tengine-overlay.svg?branch=master)](https://travis-ci.org/damex/tengine-overlay)
  
 The `tengine-overlay` overlay is designed to be used with `Gentoo Linux`, however, ebuilds from this overlay can be used on any modern Gentoo Linux based derivative.
 
