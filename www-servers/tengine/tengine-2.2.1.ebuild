@@ -60,7 +60,7 @@ done
 RESTRICT="mirror"
 
 SLOT="0"
-KEYWORDS="*"
+KEYWORDS="~amd64 ~x86"
 
 mods[upstream]="upstream_keepalive upstream_rbtree"
 
