@@ -83,7 +83,7 @@ mods[optional_shared]="addition flv geoip image_filter lua mp4 random_index
 
 mods[mail]="imap pop3 smtp"
 
-IUSE="+aio +http +http-cache +pcre +poll +select +syslog
+IUSE="+aio +http +http-cache +logrotate +pcre +poll +select
 	backtrace debug google_perftools ipv6 jemalloc libatomic luajit
 	pcre-jit rtsig ssl systemd vim-syntax"
 
@@ -244,8 +244,6 @@ src_configure() {
 	use pcre && tengine_configure+=" --with-pcre"
 	use pcre-jit && tengine_configure+=" --with-pcre-jit"
 	use rtsig && tengine_configure+=" --with-rtsig_module"
-
-	use syslog || tengine_configure+=" --without-syslog"
 
 	for m in ${mods[upstream]}  ${mods[upstream_shared]} \
 		${mods[upstream_optional]} \
@@ -431,8 +429,7 @@ src_install() {
 			keepdir_list+=" ${TENGINE_HOME_TMP}/${m}"
 	done
 
-	# logrotate
-	if use syslog ; then
+	if use logrotate ; then
 		insinto "${EROOT}etc/logrotate.d"
 		newins "${FILESDIR}/${PN}.logrotate" "${PN}"
 		if [[ ! -d "${EROOT}var/log/${PN}" ]] ; then
